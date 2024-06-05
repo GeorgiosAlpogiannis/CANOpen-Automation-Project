@@ -1,0 +1,105 @@
+'-----------------------------------------------------------------------------------------------------------------------
+'General Declarations 
+'I/O's
+FW_type = 1 '(1 = F3 (2.1a), 2 = G4 (3.0), 3 = F3 (2.2))
+motor_type = 1 ' (1 = BLDC, 2 = Induction, 3 = Brushed DC, 4 = Sensorless)
+soft_STO = 0 ' set to 1 in case controller has soft STO. 
+DO_nr = 4'# of digital outputs
+pow_a = 4' binary 
+AI_nr = 8'# of analog inputs 
+PI_nr = 8
+DI_nr = 10'# of digital inputs 
+'wait times 
+t_wait_long = 3000'ms
+t_wait_mid = 1000'ms
+t_wait_short = 10'ms
+bool_vars_nr = 65'# of boolean vars
+ff_nr = 6' # of fault flags tested
+DINA_nr = 7 '# of DIN actions tested
+DOA_nr = 7' # of DO actions tested
+MC_test = 40 ' test Motor Command value
+fail_count = 0' # of failed tests
+acc_low = 1000'set acceleration to 100 RPM/s
+acc_mid = 10000'set acceleration to 1000 RPM/s
+acc_high = 50000'set acceleration to 5000 RPM/s
+user_vars = 5
+MC_max = 1000'max motor command
+MC_test_mid = 200'motor command
+freq_bound_high = 1050'Hz, use for PMOD 2
+freq_bound_low = 995'Hz, use for PMOD 2
+for i = 1 andwhile i <= user_vars 
+	setcommand(_VAR, i, 0)'clear all USER VAR's
+next
+cc = 1 ' channel 
+if cc = 3
+	kk = 4 ' used when cc =3 
+else
+	kk = cc ' used when cc =3 
+end if
+setconfig(_SED,0,0)'Disable sensor error detection for all channels. 
+'setconfig(_SED,cc,2)'Eable sensor error detection for channel under test!. 
+cc_gain_1 = 0+cc ' used for PID gain channel selection  
+cc_gain_2 = 2+cc
+gain_check = 50000'test value for PID gains
+ratio_lim_low = 95' tolerance in %, when comparing values  
+ratio_lim_high = 105' tolerance in %, when comparing values  
+'----------------------------------------------------------------------------------------------------------
+'Motor/Sensor Data 
+Max_RPM = 1000
+'Equivalent circuit parameters
+Rs = 117' phase resistance [mOhm]
+setconfig(_RS, cc, Rs)' apply setting
+Ld = 250' d-axis inductance [uH]
+setconfig(_LD, cc, Ld)' apply setting
+Lq = 250' q-axis inductance [uH]
+setconfig(_LQ, cc, Lq)' apply setting
+'Pole Pair Settings
+pp_hall_enc = 5'pole pairs
+pp_sincos = 5
+pp_resolver = 3'resolver motor under test has 3 pole pairs.all others have 5. 
+pp_SSI = 5
+'PPR/CPR Settings
+enc_ppr = 4096'encoder ppr
+SSI_ppr = 4096
+sin_cos_cpr = 512
+int_sens_count_max = 500'max counts, internal sensor
+int_sens_count_min = -int_sens_count_max
+enc_count_max = 15000
+enc_count_min = -enc_count_max
+'VPM counts hall 
+hall_vpm_counts_1rev = pp_hall_enc*6'hall sensor counts for 1 mech rev
+hall_vpm_count_tolerance = 2'counts
+hall_vpm_counts_max = hall_vpm_counts_1rev + hall_vpm_count_tolerance
+hall_vpm_counts_min = hall_vpm_counts_1rev - hall_vpm_count_tolerance
+'VPM counts encoder 
+enc_vpm_counts_1rev = 4*enc_ppr
+enc_vpm_count_tolerance = 4'counts
+enc_vpm_counts_max = enc_vpm_counts_1rev + enc_vpm_count_tolerance
+enc_vpm_counts_min = enc_vpm_counts_1rev - enc_vpm_count_tolerance
+'VPM counts encoder 
+sincos_vpm_counts_1rev = sin_cos_cpr
+sincos_vpm_count_tolerance = 4'counts
+sincos_vpm_counts_max = sincos_vpm_counts_1rev + sincos_vpm_count_tolerance
+sincos_vpm_counts_min = sincos_vpm_counts_1rev - sincos_vpm_count_tolerance
+'VPM counts resolver 
+Resolver_vpm_counts_1rev = sin_cos_cpr
+Resolver_vpm_count_tolerance = 4'counts
+Resolver_vpm_counts_max = Resolver_vpm_counts_1rev + Resolver_vpm_count_tolerance
+Resolver_vpm_counts_min = Resolver_vpm_counts_1rev - Resolver_vpm_count_tolerance
+'VPM counts SSI 
+SSI_vpm_counts_1rev = SSI_ppr
+SSI_vpm_count_tolerance = 100'counts
+SSI_vpm_counts_max = SSI_vpm_counts_1rev + SSI_vpm_count_tolerance
+SSI_vpm_counts_min = SSI_vpm_counts_1rev - SSI_vpm_count_tolerance
+'ASI counts tolerance
+ASI_vpm_count_tolerance = SSI_vpm_count_tolerance'counts
+ASI_vpm_counts_max = SSI_vpm_counts_1rev + ASI_vpm_count_tolerance
+ASI_vpm_counts_min = SSI_vpm_counts_1rev - ASI_vpm_count_tolerance
+'---------------------------------------------------------------------------------------------------------
+'Motor thermistor settings 
+r25 = 60000
+b25 = -750
+motor_temp_expected = 105'deg C
+motor_temp_tolerance = 15'deg C
+motor_temp_max = motor_temp_expected + motor_temp_tolerance
+motor_temp_min = motor_temp_expected - motor_temp_tolerance
